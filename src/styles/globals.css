@@ -1,0 +1,232 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Design Tokens — 深色主题
+   主色 Black / 次色 #F5F5F5 / 强调 #5DD98E
+   ============================================================ */
+@theme {
+  --color-bg: #000000;
+  --color-ink: #f5f5f5;
+  /* 绿色信号：中度玉绿。深色底上它是"提醒"，只用在交互处，不铺页 */
+  --color-accent: #5dd98e;
+  --color-accent-deep: #147a52; /* CTA 边框 / 深绿（深色底上保持可读） */
+  --color-mute: #97999c;
+  --color-line: #262626;
+
+  --font-display: "Space Grotesk", "Noto Sans SC", "Helvetica Neue", sans-serif;
+  --font-body: "Inter", "Noto Sans SC", "Helvetica Neue", sans-serif;
+
+  /* 间距节奏：4 的倍数，编辑排版偏大留白 */
+  --spacing-section: 7rem;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-bg text-ink font-body antialiased;
+  font-feature-settings: "ss01", "cv05";
+}
+
+::selection {
+  background: var(--color-accent);
+  color: #04231a;
+}
+
+/* 自定义 Cursor 启用时隐藏系统光标（仅精确指针设备） */
+html.has-cursor,
+html.has-cursor a,
+html.has-cursor button,
+html.has-cursor [role="button"] {
+  cursor: none;
+}
+
+/* Firefox（不支持 ::-webkit-scrollbar）—— 标准属性 */
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-ink), transparent 72%)
+      transparent;
+  }
+}
+
+/* Chromium / Safari —— 伪元素精确控制 */
+::-webkit-scrollbar {
+  width: 6px; /* 实际想要多宽改这里 */
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent; /* 轨道不画背景，直接透出页面 */
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-ink), transparent 65%);
+  border-radius: 9999px; /* 胶囊条，与全站圆角语言一致 */
+  border: 1px solid transparent;
+  background-clip: padding-box; /* 内缩 2px，条更纤细 */
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--color-accent), transparent 25%);
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-button {
+  display: none; /* 顶部/底部三角箭头不要 */
+  height: 0;
+  width: 0;
+}
+
+/* ============================================================
+   Tactile System — 实体感 + 动态光照
+   ------------------------------------------------------------
+   JS（useTactile）只写入两个方向变量：
+     --lx / --ly   ∈ [-1, 1]  光源相对元素中心的方向
+   阴影在 CSS 中由变量计算得出，绝不写死。
+   深色主题：底面更深，靠"顶部高光 + 底部厚度 + 偏移投影"
+   表达实体感；投影落在背景方块纹理上依然可见。
+   ============================================================ */
+.tactile {
+  /* 光照方向（JS 动态更新，无 JS 时保持静态向下的阴影） */
+  --lx: 0;
+  --ly: 0;
+  /* 厚度参数：各元素可按需覆盖 */
+  --depth: 5px; /* 阴影最大偏移 */
+  --edge: 3px; /* 底部厚度边 */
+  --sblur: 0px; /* 扩散 */
+  --salpha: 0.4; /* 阴影浓度（深色底上要更浓才可见） */
+  --lift: 0px; /* 垂直位移 */
+
+  position: relative;
+  transform: translateY(var(--lift));
+  box-shadow:
+    calc(var(--lx) * var(--depth) * -1) calc(var(--ly) * var(--depth) * -1 + var(--edge))
+      0 var(--sblur) rgba(0, 0, 0, var(--salpha)),
+    0 var(--edge) 0 -1px rgba(0, 0, 0, 0.6), /* 底部厚度 */
+    inset 0 1px 0 rgba(255, 255, 255, 0.05); /* 顶端高光 */
+  transition:
+    box-shadow 220ms var(--ease-out-soft),
+    transform 180ms var(--ease-out-soft),
+    border-color 180ms ease;
+  will-change: box-shadow;
+}
+
+@media (hover: hover) {
+  .tactile:hover {
+    --depth: calc(var(--depth-base, 5px) * 1.6);
+    --lift: -2px;
+    --salpha: 0.5;
+    --sblur: 10px;
+  }
+  .tactile:active {
+    --lift: 2px;
+    --depth: 2px;
+    --edge: 1px;
+    --sblur: 2px;
+    --salpha: 0.3;
+  }
+}
+
+/* CTA — 机械按键质感（绿底 + 深绿描边） */
+.tactile-cta {
+  --depth-base: 4px;
+  --depth: 4px;
+  --edge: 2px;
+  background: var(--color-accent);
+  border: 1.5px solid var(--color-accent-deep);
+  color: #04231a;
+  box-shadow:
+    calc(var(--lx) * var(--depth) * -1) calc(var(--ly) * var(--depth) * -1 + var(--edge))
+      0 var(--sblur) rgba(20, 122, 82, var(--salpha)),
+    0 var(--edge) 0 0 var(--color-accent-deep),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6); /* 顶边细微高光 */
+}
+.tactile-cta:hover {
+  --sblur: 5px; /* 覆盖 .tactile:hover 的 10px，按钮阴影保持收敛 */
+}
+
+/* 次级按钮 — 深色面 + 白描边 */
+.tactile-ghost {
+  --depth-base: 3px;
+  --depth: 3px;
+  --edge: 2px;
+  background: #141414;
+  border: 1.5px solid rgba(245, 245, 245, 0.82);
+}
+
+/* 卡片 / 面板 — 凸起纸片（深色纸面） */
+.tactile-card {
+  --depth-base: 8px;
+  --depth: 8px;
+  --edge: 4px;
+  --salpha: 0.5;
+  background: #151515;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow:
+    calc(var(--lx) * var(--depth) * -1) calc(var(--ly) * var(--depth) * -1 + var(--edge))
+      0 var(--sblur) rgba(0, 0, 0, var(--salpha)),
+    0 var(--edge) 0 -1px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ============================================================
+   Placeholder 图 — 斜线纹理，明确"待替换"
+   ============================================================ */
+.ph {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.055) 0px,
+      rgba(255, 255, 255, 0.055) 1px,
+      transparent 1px,
+      transparent 9px
+    ),
+    #0c0c0c;
+}
+
+/* 玻璃拟态 —— 适度使用：仅用于悬浮层（导航 / 移动端菜单），
+   半透明 + 背景模糊，透出底层方块纹理，保持文字可读 */
+.glass {
+  background: rgba(0, 0, 0, 0.58);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+}
+
+.text-outline {
+  -webkit-text-stroke: 1.5px var(--color-ink);
+  color: transparent;
+}
+
+.hairline {
+  border-color: rgba(245, 245, 245, 0.16);
+}
+
+/* 数字标号（编辑杂志感） */
+.index-num {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+/* ============================================================
+   Reduced motion — 关闭动态阴影与位移动画
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .tactile,
+  .tactile:hover,
+  .tactile:active {
+    transform: none;
+    transition: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "kenc-hero",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "独立预览版 Hero —— 来自 kenc-portfolio。深色主题 + 立体方块纹理 + 自定义光标 + 实体按键动效。",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host"
+  },
+  "dependencies": {
+    "framer-motion": "^12.23.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.11",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.6.0",
+    "tailwindcss": "^4.1.11",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5"
+  }
+}
