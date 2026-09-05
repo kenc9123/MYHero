@@ -1,8 +1,8 @@
 <div align=center>
 
-<h1 style="letter-spacing: 0.05em;">MYHERO<span style="color: #5dd98e">.</span></h1>
+# MYHERO $\color{#5DD98E}{.}$
 
-<p style="color: #97999c; letter-spacing: 0.2em; text-transform: uppercase">Interface Preview · Standalone</p>
+<p style="color: #97999c; letter-spacing: 0.2em;">INTERFACE PREVIEW · STANDALONE</p>
 
 </div>
 
